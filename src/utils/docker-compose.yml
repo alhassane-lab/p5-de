@@ -1,0 +1,27 @@
+version: '3.8'
+services:
+  mongo:
+    image: mongo:latest
+    container_name: mongo-db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: healthcare_db
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+
+  migration:
+    build: .
+    container_name: migration-script
+    depends_on:
+      - mongo
+    environment:
+      MONGO_URI: mongodb://root:password@mongo:27017/healthcare_db?authSource=admin
+    volumes:
+      - .:/app
+
+volumes:
+  mongo-data:
