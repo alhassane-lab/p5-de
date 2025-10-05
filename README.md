@@ -13,3 +13,5 @@ docker compose up -d --build
 ### 4) verify logs
 docker compose logs loader
 docker compose logs mongodb
+
+https://www.youtube.com/watch?v=gFjpv-nZO0U
