@@ -14,4 +14,6 @@ docker compose up -d --build
 docker compose logs loader
 docker compose logs mongodb
 
+
+### to learn mongo x dockercompose
 https://www.youtube.com/watch?v=gFjpv-nZO0U
