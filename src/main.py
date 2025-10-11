@@ -18,7 +18,9 @@ def main():
         get_vars()['mongo_host'],
         get_vars()['mongo_port'],
         get_vars()['mongo_db'],
-        get_vars()['mongo_col']
+        get_vars()['mongo_col'],
+        get_vars()['mongo_user'],
+        get_vars()['mongo_password']
     )
 
 

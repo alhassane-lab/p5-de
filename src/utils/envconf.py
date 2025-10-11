@@ -20,6 +20,8 @@ def get_vars():
         'mongo_col': os.getenv("MONGO_COLLECTION"),
         'mongo_host': os.getenv("MONGO_HOST"),
         'mongo_port': os.getenv("MONGO_PORT"),
+        'mongo_user' : os.getenv("MONGO_APP_USER"),
+        'mongo_password' : os.getenv("MONGO_APP_PASSWORD")
     }
     return kwargs
 

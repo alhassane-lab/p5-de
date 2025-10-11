@@ -1,19 +1,22 @@
-version: "3.9"
-
 services:
   mongo:
     image: mongo:6
     container_name: mongo
     ports:
-      - "27018:27017"
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: process.env.ROOT_USERNAME
+      MONGO_INITDB_ROOT_PASSWORD: process.env.ROOT_PASSWORD
+      MONGO_INITDB_DATABASE: admin
     volumes:
       - ./mongo-data:/data/db
+      - ./initdb:/docker-entrypoint-initdb.d:ro
 
   app:
     build: .
     container_name: mongo-mig
     depends_on:
       - mongo
-    environment:
-      - MONGO_URI=mongodb://mongo:27017
+    #environment:
+      #MONGO_URI: mongodb://root:password@mongo:27017/admin
     command: poetry run python -m src.main
