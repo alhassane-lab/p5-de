@@ -17,6 +17,4 @@ services:
     container_name: mongo-mig
     depends_on:
       - mongo
-    #environment:
-      #MONGO_URI: mongodb://root:password@mongo:27017/admin
     command: poetry run python -m src.main
