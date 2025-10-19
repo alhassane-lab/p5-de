@@ -1,11 +1,6 @@
-"""
-clean and normalize a dataframe columns
-"""
-
 import pandas as pd
 import re
 from typing import List, Tuple, Optional
-
 
 def process_data(
         data_path: str,
@@ -17,21 +12,7 @@ def process_data(
         string_transform: str = 'title',
         on_bad_lines: str = 'skip'
 ) -> pd.DataFrame:
-    """Process a CSV DataFrame with minimal loops using vectorized operations.
-
-    Args:
-        data_path: Path to CSV file.
-        string_columns: Columns to treat as strings.
-        numeric_columns: Columns to convert to numeric.
-        date_columns: Columns to convert to datetime.
-        duration_columns: (start_date, end_date, new_column) for duration in days.
-        required_columns: Columns requiring non-NaN values.
-        string_transform: String transformation ('title', 'capitalize', 'upper').
-        on_bad_lines: How to handle bad CSV lines ('skip', 'warn', 'error').
-
-    Returns:
-        Processed DataFrame with cleaned and normalized columns.
-    """
+    """Process a CSV DataFrame with minimal loops using vectorized operations."""
     # Charger CSV et normaliser les noms de colonnes
     df = pd.read_csv(data_path, on_bad_lines=on_bad_lines)
     df.columns = [re.sub(r"[ .-]+", "_", c.strip().lower()) for c in df.columns]
@@ -45,8 +26,12 @@ def process_data(
     if string_columns:
         transform = getattr(str, string_transform, str.title)
         str_cols = [col for col in string_columns if col in df.columns]
-        df[str_cols] = df[str_cols].apply(lambda s: s.str.replace('"', '', regex=False).str.strip().apply(
-            lambda x: transform(x) if isinstance(x, str) else x))
+        df[str_cols] = df[str_cols].apply(
+            lambda s: s.str.replace('"', '', regex=False)
+                      .str.replace(r'\s+', ' ', regex=True)  # Remplacer espaces multiples
+                      .str.strip()
+                      .apply(lambda x: transform(x) if isinstance(x, str) else x)
+        )
 
     # Conversions vectorisées pour les numériques et dates
     if numeric_columns:
@@ -56,7 +41,7 @@ def process_data(
         date_cols = [col for col in date_columns if col in df.columns]
         df[date_cols] = df[date_cols].apply(pd.to_datetime, errors='coerce')
 
-    # Calcul de la durée (seule boucle explicite, conditionnelle)
+    # Calcul de la durée
     if duration_columns and duration_columns[0] in df.columns and duration_columns[1] in df.columns:
         df[duration_columns[2]] = (df[duration_columns[1]] - df[duration_columns[0]]).dt.days
 

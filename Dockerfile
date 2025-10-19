@@ -1,4 +1,4 @@
-FROM python:3.9-slim
+FROM python:3.11-slim
 
 WORKDIR /app
 
@@ -6,7 +6,6 @@ WORKDIR /app
 COPY . .
 
 # Install dependencies via Poetry
-RUN pip install poetry && poetry install --no-root
-
+RUN pip install poetry && poetry install
 # Run the main script
-CMD ["poetry", "run", "python", "-m", "src.main"]
+#CMD ["poetry", "run", "python", "-m", "src.main"]
