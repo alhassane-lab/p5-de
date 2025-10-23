@@ -1,6 +1,5 @@
-# Projet P5 Data Engineer
-
-Ce projet implémente une pipeline de migration de données à partir d'un fichier CSV (`healthcare_dataset.csv`) vers une base de données MongoDB, avec des tests unitaires et d'intégration pour valider le processus. Il utilise Docker pour gérer les services (MongoDB, migration, tests) et Poetry pour la gestion des dépendances Python. Le script principal traite le fichier CSV, applique des transformations (normalisation, calcul de durées), et migre les données (par exemple, 55 500 documents) vers une collection MongoDB. Les tests utilisent `mongomock` pour simuler l'insertion de 3 documents.
+# MongoDB Data Migration Pipeline
+Ce projet implémente une pipeline de migration de données à partir d'un fichier CSV (`healthcare_dataset.csv`) vers une base de données MongoDB, avec des tests unitaires et d'intégration pour valider le processus. Il utilise Docker pour gérer les services (MongoDB, migration, tests) et Poetry pour la gestion des dépendances Python dans les conteneurs. Le script principal traite le fichier CSV, applique des transformations (normalisation, calcul de durées), et migre les données (par exemple, 55 500 documents) vers une collection MongoDB. Les tests utilisent `mongomock` pour simuler l'insertion de 3 documents.
 
 ## Table des matières
 - [Prérequis](#prérequis)
@@ -15,9 +14,8 @@ Ce projet implémente une pipeline de migration de données à partir d'un fichi
 Pour exécuter ce projet localement, assurez-vous d'avoir installé :
 - **Docker** : Pour exécuter les conteneurs MongoDB, migration, et tests.
 - **Docker Compose** : Pour orchestrer les services.
-- **Python 3.11** : Requis pour Poetry et l'exécution locale hors Docker.
-- **Poetry** : Pour gérer les dépendances Python.
 - **Git** : Pour cloner le dépôt.
+- **Poetry** (optionnel) : Requis uniquement pour exécuter le projet hors Docker.
 
 ## Structure du projet
 ```
@@ -69,17 +67,11 @@ p5-de/
    Assurez-vous que `data/healthcare_dataset.csv` existe. Ce fichier contient les données à migrer (par exemple, informations sur les patients comme `name`, `age`, `admission_date`, `discharge_date`).
 
 4. **Installer les dépendances (optionnel, pour exécution hors Docker)** :
+   Si vous souhaitez exécuter le projet localement sans Docker (par exemple, pour déboguer ou lancer les tests), assurez-vous que Poetry est installé et exécutez :
    ```bash
-   curl -sSL https://install.python-poetry.org | python3 -
-   poetry install --no-interaction --no-ansi
+   poetry install
    ```
-
-5. **Vérifier la date système** :
-   Assurez-vous que la date système est correcte (par exemple, 2024) pour éviter des problèmes avec les dépendances ou certificats :
-   ```bash
-   date
-   sudo date -s "2024-10-23 11:30:00"
-   ```
+   Cela installe les dépendances définies dans `pyproject.toml` dans un environnement virtuel.
 
 ## Exécution de la migration
 Pour lancer la migration des données du fichier CSV vers MongoDB :
@@ -176,7 +168,12 @@ Le processus de migration est géré par les scripts `src/main.py`, `src/pipelin
    - L’option `-s` dans pytest permet l’affichage des `print()` dans `mongo-test`.
 
 ## Tests
-Pour exécuter les tests manuellement (hors Docker) :
+Pour exécuter les tests manuellement dans un conteneur Docker :
+```bash
+docker compose run mongo-test
+```
+
+Pour exécuter les tests localement hors Docker (nécessite Poetry et Python 3.11) :
 ```bash
 poetry run pytest tests/ -v -s
 ```
@@ -195,17 +192,18 @@ poetry run pytest tests/ -v -s
 - **Problème : Fichier `healthcare_dataset.csv` introuvable** :
   - Assurez-vous que `data/healthcare_dataset.csv` existe à la racine du projet.
   - Vérifiez que le chemin dans `src/main.py` (`BASE_DIR / "data" / "healthcare_dataset.csv"`) est correct.
-- **Problème : Date système incorrecte (ex. : 2025)** :
-  - Corrigez la date système :
-    ```bash
-    sudo date -s "2024-10-23 11:30:00"
-    ```
 - **Problème : Erreurs dans les tests** :
-  - Vérifiez que `poetry.lock` est à jour :
+  - Vérifiez que `poetry.lock` est à jour dans le conteneur :
     ```bash
-    poetry lock --no-update
+    docker compose run mongo-mig poetry lock --no-update
     ```
-  - Confirmez que `mongomock`, `pytest`, et `pytest-mock` sont installés (`poetry show`).
+  - Confirmez que `mongomock`, `pytest`, et `pytest-mock` sont installés dans l’image Docker (`poetry show`).
   - Vérifiez les logs des tests pour identifier l’erreur spécifique.
+- **Problème : Poetry non installé pour exécution hors Docker** :
+  - Installez Poetry avec :
+    ```bash
+    curl -sSL https://install.python-poetry.org | python3 -
+    ```
+  - Puis exécutez `poetry install` à la racine du projet.
 
 Pour plus d’aide, contactez l’auteur.
